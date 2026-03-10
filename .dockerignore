@@ -1,0 +1,18 @@
+# Dependencies and build artifacts
+node_modules/
+dist/
+build
+
+# Version control
+.git/
+ gitignore
+ dockerignore
+ DockerFile
+
+# Environment and sensitive files
+.env
+npm-debug.log*
+
+# Test and temporary files
+**/coverage
+*.test.js

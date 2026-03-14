@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        DEV_REGISTRY = "your-dockerhub-username/dev"
-        PROD_REGISTRY = "your-dockerhub-username/prod"
+        DEV_REGISTRY = "mubha/dev"
+        PROD_REGISTRY = "mubha/prod"
         IMAGE_NAME = "react-static-app"
         IMAGE_TAG = "latest"
     }

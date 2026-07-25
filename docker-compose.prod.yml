@@ -1,0 +1,8 @@
+version: "3.8"
+
+services:
+  react-container:
+    image: your-dockerhub-username/dev:latest   # deploy.sh rewrites this line
+    ports:
+      - "80:80"
+    restart: unless-stopped

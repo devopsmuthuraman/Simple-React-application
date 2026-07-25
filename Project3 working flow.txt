@@ -1,0 +1,274 @@
+Project Reactjs appplication
+
+Concept
+Deploying reactjs application in ec2 machine. Using Jenkins for CI/CD pipeline.
+
+Overall project flow
+
+---------------------------------------------------------
+1. Add DockerFile with source code
+2. Add Dockerignore file
+3. Create docker-compose file to use docker imaage file
+4. create build.sh with code - for building docker image
+5. create deploy.sh with code -  for deploying the  image to server
+6. Add Jenkinsfile 
+7. Add Gitignore file
+8. Open dockerhub repository and create 2 repositories
+	- Dev public repository
+	- Prod private repository
+
+9. Launch Ec2 machine
+10. Set firewall security with ec2
+11. Install docker in machine
+12. Install Jenkins in machine
+13. Install Git in machine
+14. Build Docker imaage using DockerFile
+15. Dockerizing the docker image (containerization)
+16. Jenkin access
+17. Create pipeline job with jenkins
+18. Github-Webhook auto deployment
+19. Publishing docker image to dockerhub
+
+-----------------------------------------------
+1. DockerFile
+
+	# Use lightweight nginx image
+	FROM nginx:alpine
+
+	# Remove default nginx website
+	  RUN rm -rf /usr/share/nginx/html/*
+
+	# Copy project files into nginx public folder
+	  COPY . /usr/share/nginx/html
+
+	# Expose port
+	  EXPOSE 80
+
+	# Start nginx
+	  CMD ["nginx", "-g", "daemon off;"]
+----------------------------------------------
+2. Dockerignore file
+	
+	node_modules
+	.git
+	Dockerfile
+	README.md
+
+---------------------------------------------
+3. Create .build.sh
+	
+	#!/bin/bash
+
+	# Stop script if any command fails
+	set -e
+
+	# Variables
+	IMAGE_NAME="react-app"
+	IMAGE_TAG="latest"
+
+	echo "Starting Docker build..."
+
+	# Build Docker image
+	docker build -t $IMAGE_NAME:$IMAGE_TAG .
+
+	echo "Docker image built successfully!"
+	echo "Image: $IMAGE_NAME:$IMAGE_TAG"
+
+	# Optional: show images
+	docker images | grep $IMAGE_NAME
+
+----------------------------------------------------------
+3. Docker compose-file
+	
+	version: '3.8'
+	Service:
+	react-container:
+	build: .
+	ports: 
+	- 3000:3000
+	volumes:
+	- ./src:/app/src
+	- /app/node_modules
+	environment:
+	- WATCHPACK_POLLING=true'
+
+----------------------------------------------
+1. Launch ec2
+
+	Create Ec2 instance
+	Take server on remote
+	Sudo apt update
+----------------------------------
+
+2. Firewallsetup in ec2
+
+	select security gropu option of ec2
+
+	Add inbound rule
+
+	Custom Tcp - port range 8080 - Anywhere IPV4
+------------------------------------------
+3. Install Docker
+
+	sudo apt-get install docker.io -y
+	sudo systemctl start docker
+	sudo systemctl enable docker
+	docker --version
+	sudo usermod -a -G docker $(whoami)
+----------------------------------
+
+ 
+5. Install Git in ec2
+ 
+	Sudo apt install git -y
+	
+--------------------------------------------------------------	
+4. Jenkins
+
+	sudo apt update
+	sudo apt install fontconfig openjdk-21-jre
+	java -version
+
+	sudo wget -O /etc/apt/keyrings/jenkins-keyring.asc \
+	https://pkg.jenkins.io/debian-stable/jenkins.io-2026.key
+	echo "deb [signed-by=/etc/apt/keyrings/jenkins-keyring.asc]" \
+	https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+	/etc/apt/sources.list.d/jenkins.list > /dev/null
+	
+	sudo apt update
+	sudo apt install jenkins
+
+	sudo systemctl enable jenkins
+	sudo systemctl start jenkins
+	sudo systemctl status jenkins
+
+------------------------------------------------------
+
+ 
+ -----------------------------------------------------------
+.  Jenkins access
+	
+	Open Jenkins in 8080 port via ec2 public ID
+
+	Create Jenkin user
+
+	-> OPen manage jenkins
+ 
+	install required plugins (docket plgin, stage plugins)
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ ***********************************************************
+6. Create Docker image
+ 
+	using react project create docker image
+ 
+	6.1.Create DockerFile
+ 
+		#Base image
+		FROM node:latest
+
+		#Working directory
+		RUN mkdir /app
+		WORKDIR /app
+
+		#Copy package to /app
+		COPY package*.jason ./
+
+		#Install npn
+		RUN npm install
+
+		#Copy all files
+		COPY . .
+
+		#Port expose
+		EXPOSE 3000
+
+		#Run the code
+		CMD ["npm". "start"]
+	
+	6.2.Create Dockerignore file
+	    
+		#Dependencies and build artifacts
+		 node_modules/
+		 dist/
+		 build
+
+        #Version control
+		 .git/
+		 gitignore
+		 dockerignore
+		 DockerFile
+
+		#Environment and sensitive files
+		 .env
+		 npm-debug.log*
+		
+	6.3.Build Docker image
+		
+		#cmd
+		docker build -t react-image .
+------------------------------------------------------------------
+
+7. Dockerizing the image (using docker compose-file)
+	
+	#create docker-compose-file (docker-compose.yaml)
+
+	version: '3.8'
+	Service:
+	react-container:
+	build: .
+	ports: 
+	- 3000:3000
+	volumes:
+	- ./src:/app/src
+	- /app/node_modules
+	environment:
+	- WATCHPACK_POLLING=true'		
+	
+	
+
+-----------------------------------------------------------------
+ 
+ ------------------------------------------------------------
+. Create new pipeline job in Jenkins
+
+	#Script
+
+	pipeline {
+	agent any
+  
+	stages ('Cloning code') {
+		steps {
+	  	  
+		}
+	}
+  
+    stages ('Container creating') {
+		steps {
+	  	
+		}  
+	}
+   
+    stages ('Deploying container') {
+		steps {
+	  	  
+		}   
+
+	}
+	
+----------------------------------------------------------------	
+
+
+
+

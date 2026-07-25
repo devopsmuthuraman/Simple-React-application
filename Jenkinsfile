@@ -2,16 +2,16 @@ pipeline {
     agent any
 
     environment {
-        DEV_REGISTRY = "your-dockerhub-username/dev"
+        DEV_REGISTRY  = "your-dockerhub-username/dev"
         PROD_REGISTRY = "your-dockerhub-username/prod"
-        IMAGE_NAME = "react-static-app"
-        IMAGE_TAG = "latest"
+        IMAGE_NAME    = "react-static-app"
+        IMAGE_TAG     = "latest"
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git url: 'https://github.com/your-org/devops-build.git',
+                git url: 'https://github.com/devopsmuthuraman/Simple-React-application.git',
                     branch: "${BRANCH_NAME}"
             }
         }
@@ -19,7 +19,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 sh 'chmod +x build.sh'
-                sh './build.sh'
+                sh "./build.sh ${BRANCH_NAME}"
             }
         }
 
@@ -31,14 +31,12 @@ pipeline {
                         usernameVariable: 'DOCKER_USER',
                         passwordVariable: 'DOCKER_PASS'
                     )]) {
-                        sh "echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin"
+                        sh "echo \$DOCKER_PASS | docker login -u \$DOCKER_USER --password-stdin"
 
                         if (env.BRANCH_NAME == 'dev') {
-                            sh "docker tag react-static-app:latest $DEV_REGISTRY:$IMAGE_TAG"
-                            sh "docker push $DEV_REGISTRY:$IMAGE_TAG"
+                            sh "docker push ${DEV_REGISTRY}:${IMAGE_TAG}"
                         } else if (env.BRANCH_NAME == 'master') {
-                            sh "docker tag react-static-app:latest $PROD_REGISTRY:$IMAGE_TAG"
-                            sh "docker push $PROD_REGISTRY:$IMAGE_TAG"
+                            sh "docker push ${PROD_REGISTRY}:${IMAGE_TAG}"
                         } else {
                             echo "Branch is neither dev nor master. Skipping Docker push."
                         }
@@ -50,17 +48,17 @@ pipeline {
         stage('Deploy') {
             steps {
                 sh 'chmod +x deploy.sh'
-                sh './deploy.sh'
+                sh "./deploy.sh ${BRANCH_NAME}"
             }
         }
     }
 
     post {
         success {
-            echo " Deployment completed successfully for branch ${BRANCH_NAME}!"
+            echo "Deployment completed successfully for branch ${BRANCH_NAME}!"
         }
         failure {
-            echo " Pipeline failed. Check logs."
+            echo "Pipeline failed. Check logs."
         }
     }
 }

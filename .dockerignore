@@ -1,13 +1,14 @@
 # Dependencies and build artifacts
-node_modules/
-dist/
+node_modules
 build
+dist
 
 # Version control
-.git/
- gitignore
- dockerignore
- DockerFile
+.git
+.gitignore
+.dockerignore
+Dockerfile
+Dockerfile.dev
 
 # Environment and sensitive files
 .env

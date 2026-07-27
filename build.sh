@@ -5,8 +5,8 @@ set -e
 BRANCH=${1:-dev}   # default to dev if no argument
 
 IMAGE_NAME="react-static-app"
-DEV_IMAGE="your-dockerhub-username/dev:latest"
-PROD_IMAGE="your-dockerhub-username/prod:latest"
+DEV_IMAGE="mubha/dev:latest"
+PROD_IMAGE="mubha/prod:latest"
 
 echo "Building Docker image for branch '$BRANCH'..."
 docker build -t $IMAGE_NAME:latest .

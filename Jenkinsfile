@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    parameters {
+        string(name: 'BRANCH_NAME', defaultValue: 'main', description: 'Branch to build and deploy')
+    }
+
     environment {
         DEV_REGISTRY  = "mubha/dev"
         PROD_REGISTRY = "mubha/prod"
@@ -11,14 +15,15 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                // Just remove the when block entirely if this job only ever builds main
+                git url: 'https://github.com/devopsmuthuraman/Simple-React-application.git',
+                    branch: "${params.BRANCH_NAME}"
             }
         }
 
         stage('Build Docker Image') {
             steps {
                 sh 'chmod +x build.sh'
-                sh "./build.sh ${BRANCH_NAME}"
+                sh "./build.sh ${params.BRANCH_NAME}"
             }
         }
 
@@ -32,12 +37,12 @@ pipeline {
                     )]) {
                         sh "echo \$DOCKER_PASS | docker login -u \$DOCKER_USER --password-stdin"
 
-                        if (env.BRANCH_NAME == 'dev') {
+                        if (params.BRANCH_NAME == 'dev') {
                             sh "docker push ${DEV_REGISTRY}:${IMAGE_TAG}"
-                        } else if (env.BRANCH_NAME == 'master') {
+                        } else if (params.BRANCH_NAME == 'main') {
                             sh "docker push ${PROD_REGISTRY}:${IMAGE_TAG}"
                         } else {
-                            echo "Branch is neither dev nor master. Skipping Docker push."
+                            echo "Branch is neither dev nor main. Skipping Docker push."
                         }
                     }
                 }
@@ -47,14 +52,14 @@ pipeline {
         stage('Deploy') {
             steps {
                 sh 'chmod +x deploy.sh'
-                sh "./deploy.sh ${BRANCH_NAME}"
+                sh "./deploy.sh ${params.BRANCH_NAME}"
             }
         }
     }
 
     post {
         success {
-            echo "Deployment completed successfully for branch ${BRANCH_NAME}!"
+            echo "Deployment completed successfully for branch ${params.BRANCH_NAME}!"
         }
         failure {
             echo "Pipeline failed. Check logs."

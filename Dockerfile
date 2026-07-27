@@ -1,17 +1,17 @@
-# Base image
+# ---- Build stage ----
 FROM node:20-alpine AS build
 
 # Working directory
 WORKDIR /app
 
 # Copy package files first (better layer caching)
-COPY package*.json ./
+COPY devops-build/package*.json ./
 
 # Install dependencies
 RUN npm install
 
-# Copy rest of the source
-COPY . .
+# Copy rest of the source from devops-build
+COPY devops-build/ ./
 
 # Build the React app
 RUN npm run build
@@ -26,5 +26,4 @@ RUN rm -rf /usr/share/nginx/html/*
 COPY --from=build /app/build /usr/share/nginx/html
 
 EXPOSE 80
-
 CMD ["nginx", "-g", "daemon off;"]

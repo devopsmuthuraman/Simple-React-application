@@ -26,4 +26,8 @@ RUN rm -rf /usr/share/nginx/html/*
 COPY --from=build /app/build /usr/share/nginx/html
 
 EXPOSE 80
+<<<<<<< HEAD
 CMD ["nginx", "-g", "daemon off;"]
+=======
+CMD ["nginx", "-g", "daemon off;"]
+>>>>>>> 8ab6d13aaab03de3f5aafe46b5d432aa7f344169

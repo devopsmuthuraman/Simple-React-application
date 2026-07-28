@@ -1,24 +1,26 @@
 #!/bin/bash
 set -e
 
-# Usage: ./build.sh <branch_name>
-BRANCH=${1:-dev}   # default to dev if no argument
+BRANCH=$1
 
-IMAGE_NAME="react-static-app"
-DEV_IMAGE="mubha/dev:latest"
-PROD_IMAGE="mubha/prod:latest"
+if [ "$BRANCH" = "dev" ]; then
 
-echo "Building Docker image for branch '$BRANCH'..."
-docker build -t $IMAGE_NAME:latest .
+    IMAGE="mubha/dev:latest"
 
-if [ "$BRANCH" == "dev" ]; then
-    echo "Tagging image for dev repo..."
-    docker tag $IMAGE_NAME:latest $DEV_IMAGE
-elif [ "$BRANCH" == "master" ]; then
-    echo "Tagging image for prod repo..."
-    docker tag $IMAGE_NAME:latest $PROD_IMAGE
+elif [ "$BRANCH" = "main" ]; then
+
+    IMAGE="mubha/prod:latest"
+
 else
-    echo "Unknown branch '$BRANCH'. Tagging as latest locally only."
+
+    echo "Unknown branch"
+
+    exit 1
+
 fi
 
-echo "Build complete."
+echo "Building $IMAGE"
+
+docker build -t $IMAGE .
+
+echo "Build Successful"
